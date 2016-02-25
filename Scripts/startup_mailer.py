@@ -8,6 +8,9 @@ import subprocess
 import smtplib
 from email.mime.text import MIMEText
 import datetime
+import time
+import RPi.GPIO as GPIO
+
 
 def connect_type(word_list):
     """ This function takes a list of words, then, depeding which key word, returns the corresponding
@@ -22,6 +25,13 @@ def connect_type(word_list):
 
     return con_type
 
+LED_PIN = 26
+
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(LED_PIN,GPIO.OUT)
+GPIO.output(LED_PIN,False)
+
+                
 # Change to your own account information
 # Account Information
 to = 'stevewithers3@gmail.com' # Email to send to.
@@ -72,3 +82,5 @@ msg['To'] = to
 smtpserver.sendmail(gmail_user, [to], msg.as_string())
 # Closes the smtp server.
 smtpserver.quit()
+GPIO.output(LED_PIN,True)
+GPIO.cleanup()
