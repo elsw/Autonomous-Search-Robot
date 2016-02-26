@@ -9,8 +9,9 @@ from RangeData import RangeData
 #when the array is read it be operated on and then cleared for the next run
 #the angle should be updated as it scans
 class SR04_Single:
-    
-    def __init__(self,trig,echo,read_group_size = 7):
+
+    #needs to sleep 3 seconds after initialising this
+    def __init__(self,trig,echo,angle_offset, read_group_size = 7):
         self.read_group_size = read_group_size
         self.readings = numpy.zeros(read_group_size)
         self.pulse_start = 0.0
@@ -21,15 +22,14 @@ class SR04_Single:
         self.angle = 0
         self.range_data = []
         self.running = False
+        self.angle_offset = angle_offset
         
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(self.trig,GPIO.OUT)
         GPIO.setup(self.echo,GPIO.IN)
         GPIO.output(self.trig, False)
-        print "Waiting For Sensor To Settle"
         time.sleep(1)
         GPIO.add_event_detect(self.echo, GPIO.BOTH, callback=self.callbackEcho)
-        time.sleep(3)
 
     def setAngle(self,angle):
         self.angle = angle
@@ -45,7 +45,8 @@ class SR04_Single:
     #finishes the current set of data and stops
     def stop(self):
         self.running = False;
-    
+    #internal use only
+    #sends out single pulse
     def __pulse(self):
         GPIO.output(self.trig, True)
         time.sleep(0.00001)
@@ -54,6 +55,8 @@ class SR04_Single:
     def cleanup(self):
         GPIO.cleanup()
 
+    #internal use only
+    #interrupt on echo GPIO pin
     def callbackEcho(self,channel):
         if(GPIO.input(self.echo)):
             #rising
@@ -64,7 +67,7 @@ class SR04_Single:
             pulse_duration = self.pulse_end - self.pulse_start
             self.readings[self.count] = pulse_duration * 17150
             if(self.count >= self.read_group_size - 1):
-                self.range_data.append(RangeData(self.angle,numpy.median(self.readings)))
+                self.range_data.append(RangeData(self.angle + self.angle_offset,numpy.median(self.readings)))
                 self.count = 0
                 if(self.running):
                     self.__pulse()

@@ -3,8 +3,8 @@ import time
 import numpy
 GPIO.setmode(GPIO.BCM)
 
-TRIG = 23 
-ECHO = 24
+TRIG = 17 
+ECHO = 27
 
 READINGS = 21
 
