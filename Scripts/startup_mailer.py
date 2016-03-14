@@ -74,13 +74,15 @@ get the index position of our ip.
 
 # Creates the text, subject, 'from', and 'to' of the message.
 #msg = MIMEText(my_ip_a + "\n" + my_ip_b)
-msg = MIMEText(ip_lines[1] + "\n" + ip_lines[2])
+msg = MIMEText(ip_lines[1] + "\n" + ip_lines[2] + "\n" + ip_lines[3] + "\n" + ip_lines[4])
 msg['Subject'] = 'IPs For RaspberryPi on %s' % today.strftime('%b %d %Y')
 msg['From'] = gmail_user
 msg['To'] = to
+print "Sending message..."
 # Sends the message
 smtpserver.sendmail(gmail_user, [to], msg.as_string())
 # Closes the smtp server.
 smtpserver.quit()
+print "success!"
 GPIO.output(LED_PIN,True)
-GPIO.cleanup()
+#GPIO.cleanup()

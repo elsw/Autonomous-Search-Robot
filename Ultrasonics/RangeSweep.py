@@ -26,6 +26,7 @@ class RangeSweep:
         self.ranger2.start()
         time.sleep(0.05)
         self.ranger3.start()
+        time.sleep(0.2)
         
         #control the servo and update the angles
         diff = self.start_deg_pwm - self.end_deg_pwm
