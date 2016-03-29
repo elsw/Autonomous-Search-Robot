@@ -28,6 +28,8 @@ class Mapping:
 
     def getPosition(self):
         return (self.locX,self.locY)
+    def getRotation(self):
+        return self.rotation
 
     def updatePosition(self,movedRotDis):
         rot_cm = movedRotDis[1] * 100 #convert m to cm

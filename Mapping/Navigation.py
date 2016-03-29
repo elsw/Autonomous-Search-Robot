@@ -23,10 +23,10 @@ class Navigation:
             self.lastRotation = -self.chosenGap.getCenterAngle()
             self.lastDistance = 0.5
             
-    def draw(self,offset,zoom,pos):
+    def draw(self,offset,zoom,pos,rot):
         for gap in self.gap_data:
-            posLeft = gap.getLeftPos(pos)
-            posRight = gap.getRightPos(pos)
+            posLeft = gap.getLeftPos(pos,rot)
+            posRight = gap.getRightPos(pos,rot)
             pygame.draw.line(self.screen,[0,255,0],(int(posLeft[0]),int(posLeft[1])),(int(posRight[0]),int(posRight[1])),2)
 
     def getLastMovement(self):
@@ -81,20 +81,20 @@ class GapData:
         
 
     #optional position of robot
-    def getLeftPos(self,pos = (0,0)):
+    def getLeftPos(self,pos = (0,0),rot = 0):
         loc = []
         # calculate X
-        loc.append(pos[0]+ int(self.rangeDataLeft.distance *self.cmPerPix* math.cos(math.radians(self.rangeDataLeft.angle - 90))))
+        loc.append(pos[0]+ int(self.rangeDataLeft.distance *self.cmPerPix* math.cos(math.radians(self.rangeDataLeft.angle - 90 + rot))))
         #calculate Y
-        loc.append(pos[1] + int(self.rangeDataLeft.distance *self.cmPerPix* math.sin(math.radians(self.rangeDataLeft.angle - 90))))
+        loc.append(pos[1] + int(self.rangeDataLeft.distance *self.cmPerPix* math.sin(math.radians(self.rangeDataLeft.angle - 90 + rot))))
         return loc
 
-    def getRightPos(self,pos = (0,0)):
+    def getRightPos(self,pos = (0,0),rot = 0):
         loc = []
         # calculate X
-        loc.append(pos[0] + int(self.rangeDataRight.distance *self.cmPerPix* math.cos(math.radians(self.rangeDataRight.angle - 90))))
+        loc.append(pos[0] + int(self.rangeDataRight.distance *self.cmPerPix* math.cos(math.radians(self.rangeDataRight.angle - 90 + rot))))
         #calculate Y
-        loc.append(pos[1] + int(self.rangeDataRight.distance *self.cmPerPix* math.sin(math.radians(self.rangeDataRight.angle - 90))))
+        loc.append(pos[1] + int(self.rangeDataRight.distance *self.cmPerPix* math.sin(math.radians(self.rangeDataRight.angle - 90 + rot))))
         return loc
 
                                                                         

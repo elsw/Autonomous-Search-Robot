@@ -38,7 +38,6 @@ if __name__ == "__main__":
         #pre move renders
         m.drawVertex()
         nav.calculateGaps(rangeData)
-        print m.getPosition()
         nav.draw(0,0,m.getPosition())
         
         m.updatePosition(nav.getLastMovement())
@@ -50,7 +49,6 @@ if __name__ == "__main__":
         pygame.display.flip()
         
         nav.drive()
-        m.updatePosition(nav.getLastMovement())
         
         for event in pygame.event.get():
             if event.type == QUIT:

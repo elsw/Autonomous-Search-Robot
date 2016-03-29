@@ -46,7 +46,7 @@ if __name__ == "__main__":
         #pre move renders
         m.drawVertex()
         nav.calculateGaps(rangeData)
-        nav.draw(0,0,m.getPosition())
+        nav.draw(0,0,m.getPosition(),m.getRotation())
         
         m.updatePosition(nav.getLastMovement())
 
