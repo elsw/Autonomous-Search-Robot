@@ -17,6 +17,7 @@ if __name__ == "__main__":
     pwm.setPWMFreq(60)                        # Set frequency to 60 Hz
     #pwm = PWM(0x40, debug=True)
     screen = pygame.display.set_mode((700, 700))
+    pygame.display.init()
     m = Mapping(screen);
     print "setting up rangers"
     r = StepSweep(pwm)
@@ -28,17 +29,21 @@ if __name__ == "__main__":
     
     print "reading..."
     while running:
+        screen.fill((255,255,255))
         r.servoToStart()
         time.sleep(1)
         rangeData = r.fullRange()
         m.addRangeData(rangeData)
-        nav.drive(rangeData)
-
-        m.draw()
+        
+        m.drawVertex()
+        nav.calculateGaps(rangeData)
+        m.updatePosition(nav.getLastMovement())
+        m.drawPosition()
         nav.draw(0,0,m.getPosition())
 
         pygame.display.flip()
-
+        
+        nav.drive()
         m.updatePosition(nav.getLastMovement())
         
         for event in pygame.event.get():
@@ -46,13 +51,6 @@ if __name__ == "__main__":
                 wait_for_input = False
                 running = False
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:
-                    wait_for_input = True
-                    while wait_for_input:
-                        for event in pygame.event.get():
-                            if event.type == pygame.KEYDOWN:
-                                if event.key == pygame.K_SPACE:
-                                    wait_for_input = False
                 if event.key == pygame.K_ESCAPE:
                     running = False
     r.cleanup()

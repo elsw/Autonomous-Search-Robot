@@ -39,10 +39,18 @@ if __name__ == "__main__":
         rangeData.append(RangeData(235,140))
         rangeData.append(RangeData(240,120))
         rangeData.append(RangeData(250,170))
-        m.rawMap(rangeData)
-        nav.drive(rangeData)
+        
+        m.addRangeData(rangeData)
 
+        m.draw()
+
+        nav.draw(0,0,m.getPosition())
+        
         pygame.display.flip()
+
+        nav.drive(rangeData)
+        m.updatePosition(nav.getLastMovement())
+        
 
         while wait_for_input:
             for event in pygame.event.get():
