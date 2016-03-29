@@ -28,6 +28,7 @@ if __name__ == "__main__":
     
     print "reading..."
     while running:
+        screen.fill((255,255,255))
         wait_for_input = True
         r.servoToStart()
         time.sleep(1)
@@ -42,14 +43,20 @@ if __name__ == "__main__":
         
         m.addRangeData(rangeData)
 
-        m.draw()
-
+        #pre move renders
+        m.drawVertex()
+        nav.calculateGaps(rangeData)
         nav.draw(0,0,m.getPosition())
         
+        m.updatePosition(nav.getLastMovement())
+
+        #post move renders
+        m.drawPosition()
+
+        #show screen
         pygame.display.flip()
 
-        nav.drive(rangeData)
-        m.updatePosition(nav.getLastMovement())
+        nav.drive()
         
 
         while wait_for_input:

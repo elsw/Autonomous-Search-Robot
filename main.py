@@ -34,12 +34,18 @@ if __name__ == "__main__":
         time.sleep(1)
         rangeData = r.fullRange()
         m.addRangeData(rangeData)
-        
+
+        #pre move renders
         m.drawVertex()
         nav.calculateGaps(rangeData)
-        m.updatePosition(nav.getLastMovement())
-        m.drawPosition()
+        print m.getPosition()
         nav.draw(0,0,m.getPosition())
+        
+        m.updatePosition(nav.getLastMovement())
+
+        #post move renders
+        m.drawPosition()
+        
 
         pygame.display.flip()
         
