@@ -67,6 +67,10 @@ class StepSweep:
         self.ranger1.join()
         self.ranger2.join()
         self.ranger3.join()
+        
+        self.range_data.sort(key=lambda x: x.angle)
+        for i in range(0,len(self.range_data)):
+            print self.range_data[i].angle
         return self.range_data
 
     def servoToStart(self):
@@ -82,7 +86,7 @@ class StepSweep:
         if r2 != 0:
             self.range_data.append(RangeData(self.angle + 120,r2))
         if r3 != 0:
-            self.range_data.append(RangeData(self.angle - 120,r3))
+            self.range_data.append(RangeData(self.angle + 240,r3))
 
     #checks a set of data
     #if the data is reliable (all agree) returns average
