@@ -25,8 +25,8 @@ class SR04_read(Thread):
         self.debug = False
         self.wait_time = wait_time # wait time between readings
         self.debug = False
-
-        self.running = True
+        
+        self.stop = False
         self.reading = False
         self.waiting_for_echo = False
         
@@ -40,7 +40,7 @@ class SR04_read(Thread):
     def run(self):
         while True:
             time.sleep(0.02) #free up other threads
-            if self.running == False:
+            if self.stop == True:
                 return 0
             while self.reading:
                 self.__pulse()
@@ -54,6 +54,8 @@ class SR04_read(Thread):
 
     def getRangeData(self):
         return self.read_buffer
+    def clearRangeData(self):
+        self.read_buffer = numpy.zeros(self.read_buffer_length)
 
     def startReading(self):
         self.reading = True
@@ -62,7 +64,7 @@ class SR04_read(Thread):
         self.reading = False
     
     def kill(self):
-        self.running = False;
+        self.stop = True;
 
         
     #internal use only

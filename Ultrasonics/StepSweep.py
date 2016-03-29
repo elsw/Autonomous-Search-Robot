@@ -18,14 +18,17 @@ class StepSweep:
         self.angle = 0.0
         
         time.sleep(3)
-
-    def fullRange(self):
         self.ranger1 = SR04_read(17,27)
         self.ranger2 = SR04_read(23,24)
         self.ranger3 = SR04_read(10,9)
+
         self.ranger1.start()
         self.ranger2.start()
         self.ranger3.start()
+
+    def fullRange(self):
+
+
         self.range_data = []
         diff = self.start_deg_pwm - self.end_deg_pwm
         #self.ranger1.debug = True
@@ -53,24 +56,16 @@ class StepSweep:
             time.sleep(float(self.ranger2.wait_time) / 3.0)
             self.ranger3.stopReading()
             time.sleep(float(self.ranger3.wait_time) / 3.0)
-
-            
             
             self.__collectData()
 
-        #kill threads
-        self.ranger1.kill()
-        self.ranger2.kill()
-        self.ranger3.kill()
-
-        #wait until they are done
-        self.ranger1.join()
-        self.ranger2.join()
-        self.ranger3.join()
+            self.ranger1.clearRangeData()
+            self.ranger2.clearRangeData()
+            self.ranger3.clearRangeData()
         
         self.range_data.sort(key=lambda x: x.angle)
-        for i in range(0,len(self.range_data)):
-            print self.range_data[i].angle
+        #for i in range(0,len(self.range_data)):
+        #    print self.range_data[i].angle
         return self.range_data
 
     def servoToStart(self):
@@ -111,6 +106,15 @@ class StepSweep:
             #print numpy.average(sorted_data[2:7])
             #print "\n"
             return numpy.average(sorted_data[2:7])
+
+    def cleanup(self):
+        self.ranger1.kill()
+        self.ranger2.kill()
+        self.ranger3.kill()
+        #wait for threads to end
+        self.ranger1.join()
+        self.ranger2.join()
+        self.ranger3.join()
             
         
         
