@@ -7,7 +7,7 @@ GPIO.setmode(GPIO.BCM)
 TRIG = 17 
 ECHO = 27
 
-READINGS = 21
+READINGS = 3
 
 pulse_start = 0.0
 pulse_end = 0.0
@@ -26,7 +26,7 @@ def callbackEcho(channel):
         pulse_end = time.time()
         pulse_duration = pulse_end - pulse_start
         result = pulse_duration * 17150
-        print "Distance : ",result," cm"
+        print result," cm"
     
 GPIO.setup(TRIG,GPIO.OUT)
 GPIO.setup(ECHO,GPIO.IN)

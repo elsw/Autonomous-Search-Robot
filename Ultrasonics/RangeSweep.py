@@ -12,7 +12,7 @@ class RangeSweep:
         self.start_deg_pwm = 620 #0 degrees
         self.end_deg_pwm = 275   #120 degrees
         self.channel = 0
-        self.time = 2 #sweep time in seconds
+        self.time = 6 #sweep time in seconds
         self.steps = 120 #number of steps in sweep
         self.angle = 120 #amount of angle sweeped
 
@@ -23,9 +23,9 @@ class RangeSweep:
         #start each ranger slighty offset on time
         self.ranger1.start()
         time.sleep(0.05)
-        self.ranger2.start()
+        #self.ranger2.start()
         time.sleep(0.05)
-        self.ranger3.start()
+        #self.ranger3.start()
         time.sleep(0.2)
         
         #control the servo and update the angles

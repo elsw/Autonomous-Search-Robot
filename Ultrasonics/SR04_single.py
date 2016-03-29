@@ -11,7 +11,7 @@ from RangeData import RangeData
 class SR04_Single:
 
     #needs to sleep 3 seconds after initialising this
-    def __init__(self,trig,echo,angle_offset, read_group_size = 7):
+    def __init__(self,trig,echo,angle_offset, read_group_size = 3):
         self.read_group_size = read_group_size
         self.readings = numpy.zeros(read_group_size)
         self.pulse_start = 0.0
@@ -23,6 +23,7 @@ class SR04_Single:
         self.range_data = []
         self.running = False
         self.angle_offset = angle_offset
+        self.debug = False
         
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(self.trig,GPIO.OUT)
@@ -67,8 +68,10 @@ class SR04_Single:
             pulse_duration = self.pulse_end - self.pulse_start
             self.readings[self.count] = pulse_duration * 17150
             if(self.count >= self.read_group_size - 1):
-                self.range_data.append(RangeData(self.angle + self.angle_offset,numpy.median(self.readings)))
+                self.range_data.append(RangeData(self.angle + self.angle_offset,numpy.amax(self.readings)))
                 self.count = 0
+                if self.debug:
+                    print numpy.amax(self.readings)
                 if(self.running):
                     self.__pulse()
             else:
@@ -76,16 +79,18 @@ class SR04_Single:
                 self.__pulse()
 
 if __name__ == "__main__":
-    s = SR04_Single(17,27)
+    s = SR04_Single(17,27,0)
+    s.debug = True
     print "reading..."
     s.start();
-    time.sleep(2)
+    #time.sleep(2)
+    raw_input()
     s.stop()
     time.sleep(0.1)
-    data = s.getRangeData()
-    for i in range(0,len(data) - 1):
-        print "Angle : " + str(data[i].angle)
-        print "Distance:" + str(data[i].distance)
-    print len(data)
-    s.cleanup()
+    #data = s.getRangeData()
+    #for i in range(0,len(data) - 1):
+    #    print "Angle : " + str(data[i].angle)
+    #    print "Distance:" + str(data[i].distance)
+    #print len(data)
+    #s.cleanup()
 
