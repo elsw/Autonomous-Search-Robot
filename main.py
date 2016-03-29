@@ -31,11 +31,15 @@ if __name__ == "__main__":
         r.servoToStart()
         time.sleep(1)
         rangeData = r.fullRange()
-        m.rawMap(rangeData)
+        m.addRangeData(rangeData)
         nav.drive(rangeData)
+
+        m.draw()
+        nav.draw(0,0,m.getPosition())
 
         pygame.display.flip()
 
+        m.updatePosition(nav.getLastMovement())
         
         for event in pygame.event.get():
             if event.type == QUIT:

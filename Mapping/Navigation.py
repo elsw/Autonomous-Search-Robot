@@ -11,18 +11,27 @@ class Navigation:
         self.readLimit = 200 #ignore everything over 200 cm
         self.locX = 350
         self.locY = 350
+        self.lastRotation = 0.0
+        self.lastDistance = 0.0
 
 
     def drive(self,rangeData):
-        self.__calculateGaps(rangeData,True)
+        self.__calculateGaps(rangeData)
         if len(self.gap_data) > 0:
             gap = self.__chooseGap(self.gap_data)
             self.motorDriver.left(-gap.getCenterAngle())
             self.motorDriver.forward(0.5)
+            self.lastRotation = -gap.getCenterAngle()
+            self.lastDistance = 0.5
             
+    def draw(self,offset,zoom,pos):
+        for gap in self.gap_data:
+            pygame.draw.line(self.screen,[0,255,0],gap.getLeftPos(pos),gap.getRightPos(pos),2)
 
+    def getLastMovement(self):
+        return (self.lastRotation,self.lastDistance)
 
-    def __calculateGaps(self,rangeData, debug = False):
+    def __calculateGaps(self,rangeData):
         minGapAngle = 20 #at least 20 degrees to be considered a gap
         self.gap_data = []
         lastAngle = 0.0
@@ -42,9 +51,7 @@ class Navigation:
                     self.gap_data.append(GapData(rangeData[lastIndex],rangeData[i],self.locX,self.locY))
                 lastAngle = rangeData[i].angle
                 lastIndex = i
-        if(debug):
-            for gap in self.gap_data:
-                pygame.draw.line(self.screen,[0,255,0],gap.getLeftPos(),gap.getRightPos(),2)
+
                 
 
     def __chooseGap(self,gapData):
@@ -58,28 +65,27 @@ class Navigation:
         return gapData[bestIndex]
 
 class GapData:
-    def __init__(self,rangeDataLeft,rangeDataRight,locX = 0, locY = 0, cmPerPix = 1):
+    def __init__(self,rangeDataLeft,rangeDataRight, cmPerPix = 1):
         self.rangeDataLeft = rangeDataLeft
         self.rangeDataRight = rangeDataRight
         self.cmPerPix = cmPerPix
-        #optional position of robot
-        self.locX = locX
-        self.locY = locY
+        
 
-    def getLeftPos(self):                                              
+    #optional position of robot
+    def getLeftPos(self,pos = [0,0]):                                              
         pos = []
         # calculate X
-        pos.append(self.locX + int(self.rangeDataLeft.distance *self.cmPerPix* math.cos(math.radians(self.rangeDataLeft.angle - 90))))
+        pos.append(pos[0]+ int(self.rangeDataLeft.distance *self.cmPerPix* math.cos(math.radians(self.rangeDataLeft.angle - 90))))
         #calculate Y
-        pos.append(self.locY + int(self.rangeDataLeft.distance *self.cmPerPix* math.sin(math.radians(self.rangeDataLeft.angle - 90))))
+        pos.append(pos[1] + int(self.rangeDataLeft.distance *self.cmPerPix* math.sin(math.radians(self.rangeDataLeft.angle - 90))))
         return pos
 
-    def getRightPos(self):                                              
+    def getRightPos(self,pos = [0,0]):                                              
         pos = []
         # calculate X
-        pos.append(self.locX + int(self.rangeDataRight.distance *self.cmPerPix* math.cos(math.radians(self.rangeDataRight.angle - 90))))
+        pos.append(pos[0] + int(self.rangeDataRight.distance *self.cmPerPix* math.cos(math.radians(self.rangeDataRight.angle - 90))))
         #calculate Y
-        pos.append(self.locY + int(self.rangeDataRight.distance *self.cmPerPix* math.sin(math.radians(self.rangeDataRight.angle - 90))))
+        pos.append(pos[1] + int(self.rangeDataRight.distance *self.cmPerPix* math.sin(math.radians(self.rangeDataRight.angle - 90))))
         return pos
 
                                                                         
