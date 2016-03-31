@@ -2,10 +2,14 @@ import time
 import numpy
 from SR04_read import SR04_read
 from RangeData import RangeData
+from threading import Thread
 
-class StepSweep:
+#this class performs a full 360 range scan
+#call fullRange() and wait for done() to be high then
+
+class StepSweep(Thread):
     def __init__(self,pwm):
-
+        super(StepSweep, self).__init__()
         self.pwm = pwm
         self.pwm_channel = 0
         self.start_deg_pwm = 620 #0 degrees
@@ -26,47 +30,77 @@ class StepSweep:
         self.ranger2.start()
         self.ranger3.start()
 
-    def fullRange(self):
+        self.stop = False
+        self.running = False
+        self.done = False
 
 
-        self.range_data = []
-        diff = self.start_deg_pwm - self.end_deg_pwm
-        #self.ranger1.debug = True
-        #self.ranger2.debug = True
+    def run(self):
+        while True:
+            if self.stop:
+                print "step stop"
+                return 0
+            if not self.running:
+                time.sleep(0.02)
+            else:
+                self.range_data = []
+                diff = self.start_deg_pwm - self.end_deg_pwm
+                #self.ranger1.debug = True
+                #self.ranger2.debug = True
+                        
+                for i in range(0,self.steps):
+                    self.pwm.setPWM(self.pwm_channel,0,self.start_deg_pwm -
+                                    (int((float(i)/float(self.steps))*float(diff))))
+                    self.angle = float(i)/float(self.steps) * float(self.angle_sweep)
+                    time.sleep(self.inter_step_time)
+
+                    #start each ranger offset from each other for less interfereance
+                    self.ranger1.startReading()
+                    time.sleep(float(self.ranger1.wait_time) / 3.0)
+                    self.ranger2.startReading()
+                    time.sleep(float(self.ranger2.wait_time) / 3.0)
+                    self.ranger3.startReading()
+                    time.sleep(float(self.ranger3.wait_time) / 3.0)
+                    
+                    time.sleep(self.step_time)
+                    
+                    self.ranger1.stopReading()
+                    time.sleep(float(self.ranger1.wait_time) / 3.0)
+                    self.ranger2.stopReading()
+                    time.sleep(float(self.ranger2.wait_time) / 3.0)
+                    self.ranger3.stopReading()
+                    time.sleep(float(self.ranger3.wait_time) / 3.0)
+                    
+                    self.__collectData()
+
+                    self.ranger1.clearRangeData()
+                    self.ranger2.clearRangeData()
+                    self.ranger3.clearRangeData()
+
+                    if self.stop:
+                        return 0
                 
-        for i in range(0,self.steps):
-            self.pwm.setPWM(self.pwm_channel,0,self.start_deg_pwm -
-                            (int((float(i)/float(self.steps))*float(diff))))
-            self.angle = float(i)/float(self.steps) * float(self.angle_sweep)
-            time.sleep(self.inter_step_time)
+                self.range_data.sort(key=lambda x: x.angle)
+                #for i in range(0,len(self.range_data)):
+                #    print self.range_data[i].angle
+                
+                #stop after singe run through
+                self.running = False
+                self.done = True
 
-            #start each ranger offset from each other for less interefereance
-            self.ranger1.startReading()
-            time.sleep(float(self.ranger1.wait_time) / 3.0)
-            self.ranger2.startReading()
-            time.sleep(float(self.ranger2.wait_time) / 3.0)
-            self.ranger3.startReading()
-            time.sleep(float(self.ranger3.wait_time) / 3.0)
-            
-            time.sleep(self.step_time)
-            
-            self.ranger1.stopReading()
-            time.sleep(float(self.ranger1.wait_time) / 3.0)
-            self.ranger2.stopReading()
-            time.sleep(float(self.ranger2.wait_time) / 3.0)
-            self.ranger3.stopReading()
-            time.sleep(float(self.ranger3.wait_time) / 3.0)
-            
-            self.__collectData()
-
-            self.ranger1.clearRangeData()
-            self.ranger2.clearRangeData()
-            self.ranger3.clearRangeData()
+    def fullRange(self):
+        self.done = False
+        self.running = True
         
-        self.range_data.sort(key=lambda x: x.angle)
-        #for i in range(0,len(self.range_data)):
-        #    print self.range_data[i].angle
+    def isDone(self):
+        return self.done
+    
+    #make sure ranging is done before calling this
+    def getRangeData(self):
         return self.range_data
+
+    def kill(self):
+        self.stop = True
 
     def servoToStart(self):
         self.pwm.setPWM(self.pwm_channel,0,self.start_deg_pwm)
@@ -99,13 +133,15 @@ class StepSweep:
             if data[i] < nmin:
                 nmin = data[i]
         data_range = nmax - nmin
-        if data_range > 100:
+        #if data_range > 100:
+        if data_range > 10000:
             return 0
         else:
             #print "average:"
             #print numpy.average(sorted_data[2:7])
             #print "\n"
-            return numpy.average(sorted_data[2:7])
+            #return numpy.average(sorted_data[2:7])
+            return numpy.average(sorted_data[0:9])
 
     def cleanup(self):
         self.ranger1.kill()

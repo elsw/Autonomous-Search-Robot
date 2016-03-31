@@ -40,7 +40,7 @@ class SR04_read(Thread):
     def run(self):
         while True:
             time.sleep(0.02) #free up other threads
-            if self.stop == True:
+            if self.stop:
                 return 0
             while self.reading:
                 self.__pulse()
@@ -64,7 +64,7 @@ class SR04_read(Thread):
         self.reading = False
     
     def kill(self):
-        self.stop = True;
+        self.stop = True
 
         
     #internal use only
