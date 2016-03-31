@@ -1,6 +1,7 @@
 from Servo_Driver.Adafruit_PWM_Servo_Driver import PWM
 from Ultrasonics.RangeSweep import RangeSweep
 from Ultrasonics.StepSweep import StepSweep
+from Ultrasonics.RangeSweep import RangeSweep
 from Ultrasonics.RangeData import RangeData
 from Mapping.Mapping import Mapping
 from Mapping.Navigation import Navigation
@@ -25,31 +26,40 @@ if __name__ == "__main__":
     nav = Navigation(motor,screen)
 
     running = True
-    wait_for_input = True
+    wait_for_results = False
+
+    r.start()
     
     print "reading..."
     while running:
-        screen.fill((255,255,255))
-        r.servoToStart()
-        time.sleep(1)
-        rangeData = r.fullRange()
-        m.addRangeData(rangeData)
+        if wait_for_results:
+            time.sleep(0.02)
+            if r.isDone():
+                rangeData = r.getRangeData()
+                #ranging is done,update graphs
+                screen.fill((255,255,255))
+                m.addRangeData(rangeData)
+                #pre move renders
+                m.drawVertex()
+                nav.calculateGaps(rangeData)
+                nav.draw(0,0,m.getPosition(),m.getRotation())
+        
+                m.updatePosition(nav.getLastMovement())
 
-        #pre move renders
-        m.drawVertex()
-        nav.calculateGaps(rangeData)
-        nav.draw(0,0,m.getPosition())
-        
-        m.updatePosition(nav.getLastMovement())
+                #post move renders
+                #m.drawPosition()
 
-        #post move renders
-        m.drawPosition()
+                pygame.display.flip()
         
+                #nav.drive()
+                wait_for_results = False
+        else:
+            #start new ranging
+            r.servoToStart()
+            time.sleep(0.7)
+            rangeData = r.fullRange()
+            wait_for_results = True
 
-        pygame.display.flip()
-        
-        nav.drive()
-        
         for event in pygame.event.get():
             if event.type == QUIT:
                 wait_for_input = False
@@ -58,5 +68,8 @@ if __name__ == "__main__":
                 if event.key == pygame.K_ESCAPE:
                     running = False
     r.cleanup()
+    #wait for threads to end
+    r.kill()
+    r.join()
     pygame.quit()
     GPIO.cleanup()
