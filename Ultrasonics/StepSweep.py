@@ -8,16 +8,17 @@ from threading import Thread
 #call fullRange() and wait for done() to be high then
 
 class StepSweep(Thread):
-    def __init__(self,pwm):
+    def __init__(self,servoDriver):
         super(StepSweep, self).__init__()
-        self.pwm = pwm
+        #self.pwm = pwm
+        self.servoDriver = servoDriver
         self.pwm_channel = 0
-        self.start_deg_pwm = 620 #0 degrees
-        self.end_deg_pwm = 275   #120 degrees
+        #self.start_deg_pwm = 620 #0 degrees
+        #self.end_deg_pwm = 275   #120 degrees
 
         self.step_time = 0.7 #sweep time in seconds
         self.inter_step_time = 0.35 #servo moving time
-        self.steps = 16 #number of steps in sweep
+        self.steps = 15  #number of steps in sweep
         self.angle_sweep = 120 #amount of angle sweeped
         self.angle = 0.0
         
@@ -44,14 +45,15 @@ class StepSweep(Thread):
                 time.sleep(0.02)
             else:
                 self.range_data = []
-                diff = self.start_deg_pwm - self.end_deg_pwm
+                #diff = self.start_deg_pwm - self.end_deg_pwm
                 #self.ranger1.debug = True
                 #self.ranger2.debug = True
                         
                 for i in range(0,self.steps):
-                    self.pwm.setPWM(self.pwm_channel,0,self.start_deg_pwm -
-                                    (int((float(i)/float(self.steps))*float(diff))))
+                    #self.pwm.setPWM(self.pwm_channel,0,self.start_deg_pwm -
+                    #                (int((float(i)/float(self.steps))*float(diff))))
                     self.angle = float(i)/float(self.steps) * float(self.angle_sweep)
+                    self.servoDriver.setAngle(self.angle)
                     time.sleep(self.inter_step_time)
 
                     #start each ranger offset from each other for less interfereance
@@ -103,7 +105,8 @@ class StepSweep(Thread):
         self.stop = True
 
     def servoToStart(self):
-        self.pwm.setPWM(self.pwm_channel,0,self.start_deg_pwm)
+        self.servoDriver.setAngle(0)
+        #self.pwm.setPWM(self.pwm_channel,0,self.start_deg_pwm)
 
     def __collectData(self):
         r1 = self.__getValue(self.ranger1.getRangeData())
@@ -133,15 +136,13 @@ class StepSweep(Thread):
             if data[i] < nmin:
                 nmin = data[i]
         data_range = nmax - nmin
-        #if data_range > 100:
-        if data_range > 10000:
+        if data_range > 100:
             return 0
         else:
             #print "average:"
             #print numpy.average(sorted_data[2:7])
             #print "\n"
-            #return numpy.average(sorted_data[2:7])
-            return numpy.average(sorted_data[0:9])
+            return numpy.average(sorted_data[2:7])
 
     def cleanup(self):
         self.ranger1.kill()
