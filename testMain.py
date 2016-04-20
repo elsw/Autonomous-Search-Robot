@@ -1,10 +1,11 @@
-from Servo_Driver.Adafruit_PWM_Servo_Driver import PWM
+#from Servo_Driver.Adafruit_PWM_Servo_Driver import PWM
 from Ultrasonics.RangeSweep import RangeSweep
 from Ultrasonics.StepSweep import StepSweep
 from Ultrasonics.RangeData import RangeData
 from Mapping.Mapping import Mapping
 from Mapping.Navigation import Navigation
 from Motor_Driver.MotorDriver import MotorDriver
+from Servo_Driver.ServoDriver import ServoDriver
 import time
 import pygame
 from pygame.locals import *
@@ -13,15 +14,16 @@ import RPi.GPIO as GPIO
 
 
 if __name__ == "__main__":
-    pwm = PWM(0x40)
-    pwm.setPWMFreq(60)                        # Set frequency to 60 Hz
+    #pwm = PWM(0x40)
+    #pwm.setPWMFreq(60)                        # Set frequency to 60 Hz
     #pwm = PWM(0x40, debug=True)
+    servoDriver = ServoDriver()
     screen = pygame.display.set_mode((700, 700))
     m = Mapping(screen)
     motor = MotorDriver()
     nav = Navigation(motor,screen)
     print "setting up rangers"
-    r = StepSweep(pwm)
+    r = StepSweep(servoDriver)
 
     running = True
     wait_for_input = True
@@ -47,7 +49,8 @@ if __name__ == "__main__":
         m.drawVertex()
         nav.calculateGaps(rangeData)
         nav.draw(0,0,m.getPosition(),m.getRotation())
-        
+
+        #print nav.getLastMovement()
         m.updatePosition(nav.getLastMovement())
 
         #post move renders

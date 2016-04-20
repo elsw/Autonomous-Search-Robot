@@ -12,7 +12,7 @@ from threading import Thread
 class SR04_read(Thread):
 
     #needs to sleep 3 seconds after initialising this
-    def __init__(self,trig,echo,read_buffer_length = 10, wait_time = 0.02):
+    def __init__(self,trig,echo,read_buffer_length = 10, wait_time = 0.05):
         super(SR04_read, self).__init__()
         self.read_buffer_length = read_buffer_length
         self.read_buffer = numpy.zeros(read_buffer_length)
@@ -100,7 +100,7 @@ if __name__ == "__main__":
     print "reading..."
     s.start();
     s.startReading()
-    time.sleep(2)
+    time.sleep(20)
     s.stopReading()
     s.kill()
     s.join()
