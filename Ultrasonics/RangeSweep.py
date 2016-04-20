@@ -23,9 +23,9 @@ class RangeSweep:
         #start each ranger slighty offset on time
         self.ranger1.start()
         time.sleep(0.05)
-        #self.ranger2.start()
+        self.ranger2.start()
         time.sleep(0.05)
-        #self.ranger3.start()
+        self.ranger3.start()
         time.sleep(0.2)
         
         #control the servo and update the angles
@@ -57,8 +57,8 @@ class RangeSweep:
         self.pwm.setPWM(self.channel,0,self.start_deg_pwm)
     
     def cleanup(self):
-        #self.ranger1.cleanup()
-        #self.ranger2.cleanup()
+        self.ranger1.cleanup()
+        self.ranger2.cleanup()
         self.ranger3.cleanup()
 
 
