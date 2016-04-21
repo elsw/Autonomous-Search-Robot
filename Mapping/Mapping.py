@@ -71,7 +71,7 @@ class Mapping:
         for i in range(1,len(self.path)):
             pygame.draw.line(self.screen,(255,0,255),(self.path[i].x,self.path[i].y),(self.path[i-1].x,self.path[i-1].y),2)
     
-    def drawVertex(offset,self):
+    def drawVertex(self,offset):
         x = int(self.lastLocX + offset[0])
         y = int(self.lastLocY + offset[1])
         pygame.draw.circle(self.screen,(255,0,0),(x,y), 100 *self.cmPerPix, 1)
