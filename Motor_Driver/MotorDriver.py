@@ -53,7 +53,7 @@ if __name__ == "__main__":
     m = MotorDriver()
     #m.forward(0.3)
     #m.forward(-0.2)
-    m.left(-90)
+    m.left(90)
     #m.left(-90)
 
     m.cleanup()
