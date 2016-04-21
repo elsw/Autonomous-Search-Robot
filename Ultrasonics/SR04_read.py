@@ -12,7 +12,7 @@ from threading import Thread
 class SR04_read(Thread):
 
     #needs to sleep 3 seconds after initialising this
-    def __init__(self,trig,echo,read_buffer_length = 10, wait_time = 0.05):
+    def __init__(self,trig,echo,read_buffer_length = 10, wait_time = 0.08):
         super(SR04_read, self).__init__()
         self.read_buffer_length = read_buffer_length
         self.read_buffer = numpy.zeros(read_buffer_length)
@@ -79,28 +79,31 @@ class SR04_read(Thread):
     def callbackEcho(self,channel):
         if(GPIO.input(self.echo)):
             #rising
+            #print "rising"
             self.pulse_start = time.time()
         else:
-            #falling
-            self.pulse_end = time.time()
-            pulse_duration = self.pulse_end - self.pulse_start
-            self.read_buffer[self.buffer_head] = pulse_duration * 17150
-            if self.debug:
-                print pulse_duration * 17150
-            self.buffer_head = self.buffer_head + 1
-            if self.buffer_head >= self.read_buffer_length:
-                self.buffer_head = 0
-            self.waiting_for_echo = False
+            if self.waiting_for_echo:
+                #falling
+                #print "falling"
+                self.pulse_end = time.time()
+                pulse_duration = self.pulse_end - self.pulse_start
+                self.read_buffer[self.buffer_head] = pulse_duration * 17150
+                if self.debug:
+                    print pulse_duration * 17150
+                self.buffer_head = self.buffer_head + 1
+                if self.buffer_head >= self.read_buffer_length:
+                    self.buffer_head = 0
+                self.waiting_for_echo = False
 
 
 if __name__ == "__main__":
-    s = SR04_read(17,27)
-    time.sleep(2)
+    s = SR04_read(23,24)
+    time.sleep(5)
     s.debug = True
     print "reading..."
     s.start();
     s.startReading()
-    time.sleep(20)
+    time.sleep(6)
     s.stopReading()
     s.kill()
     s.join()

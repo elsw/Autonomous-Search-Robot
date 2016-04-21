@@ -16,7 +16,7 @@ class StepSweep(Thread):
         #self.start_deg_pwm = 620 #0 degrees
         #self.end_deg_pwm = 275   #120 degrees
 
-        self.step_time = 0.7 #sweep time in seconds
+        self.step_time = 0.8 #sweep time in seconds
         self.inter_step_time = 0.35 #servo moving time
         self.steps = 15  #number of steps in sweep
         self.angle_sweep = 120 #amount of angle sweeped
@@ -39,7 +39,6 @@ class StepSweep(Thread):
     def run(self):
         while True:
             if self.stop:
-                print "step stop"
                 return 0
             if not self.running:
                 time.sleep(0.02)
@@ -136,7 +135,7 @@ class StepSweep(Thread):
             if data[i] < nmin:
                 nmin = data[i]
         data_range = nmax - nmin
-        if data_range > 100:
+        if data_range > 75:
             return 0
         else:
             #print "average:"
