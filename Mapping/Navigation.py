@@ -9,8 +9,8 @@ class Navigation:
         self.driveStep = 0.5#aim for driving 0.5 meter berfore anther range map
         self.gap_data = []
         self.readLimit = 200 #ignore everything over 200 cm
-        self.locX = 350
-        self.locY = 350
+        #self.locX = 350
+        #self.locY = 350
         self.lastRotation = 0.0
         self.lastDistance = 0.0
         self.chosenGap = None
@@ -24,12 +24,12 @@ class Navigation:
             
     def draw(self,offset,zoom,pos,rot):
         for gap in self.gap_data:
-            posLeft = gap.getLeftPos()
-            posRight = gap.getRightPos()
-            leftx = int(self.locX + posLeft[0])
-            lefty = int(self.locY - posLeft[1])
-            rightx = int(self.locX + posRight[0])
-            righty = int(self.locY - posRight[1])
+            posLeft = gap.getLeftPos(rot)
+            posRight = gap.getRightPos(rot)
+            leftx = int(pos[0] + posLeft[0])
+            lefty = int(pos[1] - posLeft[1])
+            rightx = int(pos[0] + posRight[0])
+            righty = int(pos[1] - posRight[1])
             if gap == self.chosenGap:
                 pygame.draw.line(self.screen,[255,0,0],(leftx,lefty),(rightx,righty),2)
             else:
@@ -79,10 +79,10 @@ class Navigation:
         #just choose most nearest facing atm
         for i in range(0,len(gapData)):
             print gapData[i].getCenterAngle()
-            if targetAngle - gapData[i].getCenterAngle() < bestAngle:
+            if abs(targetAngle - gapData[i].getCenterAngle()) < bestAngle:
                 bestAngle = targetAngle - gapData[i].getCenterAngle()
                 bestIndex = i
-            if targetAngle - (gapData[i].getCenterAngle()-360) < bestAngle:
+            if abs(targetAngle - (gapData[i].getCenterAngle()-360)) < bestAngle:
                 bestAngle = targetAngle - gapData[i].getCenterAngle()
                 bestIndex = i
         print gapData[bestIndex].getCenterAngle()
@@ -96,20 +96,20 @@ class GapData:
         
 
     #optional position of robot
-    def getLeftPos(self):
+    def getLeftPos(self, rot = 0):
         loc = []
         # calculate X
-        loc.append(int(self.rangeDataLeft.distance *self.cmPerPix* math.cos(math.radians(self.rangeDataLeft.angle - 90))))
+        loc.append(int(self.rangeDataLeft.distance *self.cmPerPix* math.cos(math.radians(self.rangeDataLeft.angle - 90 + rot))))
         #calcula+e
-        loc.append(int(self.rangeDataLeft.distance *self.cmPerPix* math.sin(math.radians(self.rangeDataLeft.angle + 90))))
+        loc.append(int(self.rangeDataLeft.distance *self.cmPerPix* math.sin(math.radians(self.rangeDataLeft.angle + 90 + rot))))
         return loc
 
-    def getRightPos(self):
+    def getRightPos(self, rot = 0):
         loc = []
         # calculate X
-        loc.append(int(self.rangeDataRight.distance *self.cmPerPix* math.cos(math.radians(self.rangeDataRight.angle - 90))))
+        loc.append(int(self.rangeDataRight.distance *self.cmPerPix* math.cos(math.radians(self.rangeDataRight.angle - 90 + rot))))
         #calculate Y 
-        loc.append(int(self.rangeDataRight.distance *self.cmPerPix* math.sin(math.radians(self.rangeDataRight.angle + 90))))
+        loc.append(int(self.rangeDataRight.distance *self.cmPerPix* math.sin(math.radians(self.rangeDataRight.angle + 90 + rot))))
         return loc
 
 
