@@ -14,12 +14,12 @@ class Navigation:
         self.lastRotation = 0.0
         self.lastDistance = 0.0
         self.chosenGap = None
-        self.distanceFromLeft = 60 # in cm
+        self.distanceFromLeft = 0 # in cm
 
 
     def drive(self):
         if len(self.gap_data) > 0:
-            self.motorDriver.left(self.lastRotation)
+            self.motorDriver.left(-self.lastRotation)
             self.motorDriver.forward(self.lastDistance)
             
     def draw(self,offset,zoom,pos,rot):
@@ -85,7 +85,7 @@ class Navigation:
             if abs(targetAngle - (gapData[i].getCenterAngle()-360)) < bestAngle:
                 bestAngle = targetAngle - gapData[i].getCenterAngle()
                 bestIndex = i
-        print gapData[bestIndex].getCenterAngle()
+        #print gapData[bestIndex].getCenterAngle()
         return gapData[bestIndex]
 
 class GapData:
