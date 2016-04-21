@@ -51,10 +51,12 @@ if __name__ == "__main__":
                 m.updatePosition(nav.getLastMovement())
 
                 #post move renders
-                m.drawPosition()
+                #m.drawPosition()
 
                 pygame.display.flip()
-        
+
+                time.sleep(5)
+                
                 nav.drive()
                 wait_for_results = False
         else:
