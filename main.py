@@ -14,6 +14,13 @@ import RPi.GPIO as GPIO
 
 
 
+def draw():
+    screen.fill((255,255,255))
+    m.drawVertex()
+    nav.draw(0,0,m.getLastPosition(),m.getLastRotation())
+    m.drawPosition()
+    pygame.display.flip()
+    
 if __name__ == "__main__":
     #pwm = PWM(0x40)
     #pwm.setPWMFreq(60)                        # Set frequency to 60 Hz
@@ -31,6 +38,9 @@ if __name__ == "__main__":
     wait_for_results = False
 
     r.start()
+
+    r.servoToStart()
+    time.sleep(0.7)
     
     print "reading..."
     while running:
@@ -38,32 +48,18 @@ if __name__ == "__main__":
             time.sleep(0.02)
             if r.isDone():
                 rangeData = r.getRangeData()
+                
                 #ranging is done,update graphs
-                screen.fill((255,255,255))
                 m.addRangeData(rangeData)
-
-                
-                #pre move renders
-                m.drawVertex()
                 nav.calculateGaps(rangeData)
-                nav.draw(0,0,m.getPosition(),m.getRotation())
-        
                 m.updatePosition(nav.getLastMovement())
-
-                #post move renders
-                #m.drawPosition()
-
-                pygame.display.flip()
-
-                time.sleep(5)
-                
+                draw()
+                r.servoToStart()
                 nav.drive()
                 wait_for_results = False
         else:
             #start new ranging
             print "new ranging..."
-            r.servoToStart()
-            time.sleep(0.7)
             rangeData = r.fullRange()
             wait_for_results = True
 
