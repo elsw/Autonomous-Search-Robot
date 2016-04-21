@@ -17,9 +17,8 @@ class Mapping:
 
         
         self.rangeLimit = 200 #this is the max range that readings are tacken as true
-        self.fusionRange = 0 #range for vertexes to affect each others probability (in cm)
-        self.rejectionRange = 300 #anything above this will lose propability if not back up by other readings
-    
+        self.agreeRange = 15  #range that considers that 2 points "agree", will increase propability of
+                              #vertices that are in this range of each other
                 
     def addRangeData(self,rangeData):
         for r in rangeData:
@@ -78,18 +77,15 @@ class Mapping:
     def __fuseVertexData(self):
         center = Vertex(self.locX,self.locY)
         for i in range(len(self.vertexData)):
-            if i < len(self.vertexData) and self.vertexData[i].distanceTo(center) <= self.rangeLimit:
+            if self.vertexData[i].distanceTo(center) <= self.rangeLimit:
                 #is inrange of robot
-                inRejectRange = False #if any other vertex where within the range
+                inAgreeRange = False #if any other vertex where within the range
                                            #that stops this vertex being rejected
                 for j in range(len(self.vertexData)):
                     #dont test against itself
                     if j != i:
                         distance = self.vertexData[j].distanceTo(self.vertexData[i])
-                        if distance < self.rejectionRange:
-                            #mark that this vertex wont be reduced in probability
-                            inRejectRange = True
-                        if distance < self.fusionRange:
+                        if distance < self.agreeRange:
                             #fuse vertices
                             #interpolate new vertex depending on propability difference
                             #pInterpolate is between 0 and 1, 0.5 being both the same P
@@ -110,10 +106,14 @@ class Mapping:
                             else:
                                 newP = 1
                             #remove both old vertices
-                            self.vertexData.pop(i)
-                            self.vertexData.pop(j)
+                            if i > j:
+                                self.vertexData.pop(i)
+                                self.vertexData.pop(j)
+                            else:
+                                self.vertexData.pop(j)
+                                self.vertexData.pop(i)
                             #add new vertex
-                            self.vertexData.append(Vertex(newX,newY,newP))
+                            self.vertexData.append(Vertex(int(newX),int(newY),int(newP)))
                             #print "fuse"
                             break
                 if inRejectRange == False:
