@@ -26,10 +26,10 @@ class Navigation:
         for gap in self.gap_data:
             posLeft = gap.getLeftPos(rot)
             posRight = gap.getRightPos(rot)
-            leftx = int(pos[0] + posLeft[0])
-            lefty = int(pos[1] - posLeft[1])
-            rightx = int(pos[0] + posRight[0])
-            righty = int(pos[1] - posRight[1])
+            leftx = int(pos[0] + posLeft[0] + offset[0])
+            lefty = int(pos[1] - posLeft[1] + offset[1])
+            rightx = int(pos[0] + posRight[0] + offset[0])
+            righty = int(pos[1] - posRight[1] + offset[1])
             if gap == self.chosenGap:
                 pygame.draw.line(self.screen,[255,0,0],(leftx,lefty),(rightx,righty),2)
             else:
