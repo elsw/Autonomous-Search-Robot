@@ -1,4 +1,4 @@
- #from Servo_Driver.Adafruit_PWM_Servo_Driver import PWM
+#from Servo_Driver.Adafruit_PWM_Servo_Driver import PWM
 from Ultrasonics.RangeSweep import RangeSweep
 from Ultrasonics.StepSweep import StepSweep
 from Ultrasonics.RangeSweep import RangeSweep
@@ -18,7 +18,7 @@ def draw():
     screen.fill((255,255,255))
     m.drawVertex(offset)
     nav.draw(offset,0,m.getLastPosition(),m.getLastRotation())
-    m.drawPosition()
+    m.drawPosition(offset)
     pygame.display.flip()
     
 if __name__ == "__main__":
@@ -36,7 +36,7 @@ if __name__ == "__main__":
 
     running = True
     wait_for_results = False
-    offset = (0,0)
+    offset = [0,0]
 
     r.start()
 
@@ -75,13 +75,13 @@ if __name__ == "__main__":
                     m.toggleEnableP()
                     draw()
                 if event.key == pygame.K_UP:
-                    offset[0] = offset[0] - 50
+                    offset[1] = offset[1] - 50
                     draw()
                 if event.key == pygame.K_DOWN:
-                    offset[0] = offset[0] + 50
+                    offset[1] = offset[1] + 50
                     draw()
                 if event.key == pygame.K_LEFT:
-                    offset[0] = offset[1] - 50
+                    offset[0] = offset[0] - 50
                     draw()
                 if event.key == pygame.K_RIGHT:
                     offset[0] = offset[0] + 50
