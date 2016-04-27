@@ -14,7 +14,7 @@ class Navigation:
         self.lastRotation = 0.0
         self.lastDistance = 0.0
         self.chosenGap = None
-        self.distanceFromLeft = 0 # in cm
+        self.distanceFromLeft = 10 # in cm
 
 
     def drive(self):
@@ -78,7 +78,6 @@ class Navigation:
         bestAngle = 10000
         #just choose most nearest facing atm
         for i in range(0,len(gapData)):
-            print gapData[i].getCenterAngle()
             if abs(targetAngle - gapData[i].getCenterAngle()) < bestAngle:
                 bestAngle = targetAngle - gapData[i].getCenterAngle()
                 bestIndex = i
