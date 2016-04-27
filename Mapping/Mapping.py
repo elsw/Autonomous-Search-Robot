@@ -62,11 +62,11 @@ class Mapping:
 
         self.path.append(PathPoint(int(self.locX),int(self.locY)))
         
-    def drawPosition(self):
-        pygame.draw.circle(self.screen,(0,0,255),(int(self.locX),int(self.locY)), 5,0)
+    def drawPosition(self,offset):
+        pygame.draw.circle(self.screen,(0,0,255),(int(self.locX+offset[0]),int(self.locY+offset[1])), 5,0)
         lineX = self.locX + 15.0 * math.cos(math.radians(self.rotation - 90))
         lineY = self.locY + 15.0 * math.sin(math.radians(self.rotation - 90))
-        pygame.draw.line(self.screen,(0,0,255),(int(self.locX),int(self.locY)),(int(lineX),int(lineY)),3)
+        pygame.draw.line(self.screen,(0,0,255),(int(self.locX+offset[0]),int(self.locY+offset[1])),(int(lineX+offset[0]),int(lineY+offset[1])),3)
 
         for i in range(1,len(self.path)):
             pygame.draw.line(self.screen,(255,0,255),(self.path[i].x,self.path[i].y),(self.path[i-1].x,self.path[i-1].y),2)
@@ -78,14 +78,14 @@ class Mapping:
         pygame.draw.circle(self.screen,(255,0,0),(x,y), 200 *self.cmPerPix, 1)
 
         for vertex in self.vertexData:
-            self.__drawDot(vertex,self.enableP)
+            self.__drawDot(vertex,offset,self.enableP)
     
-    def __drawDot(self,vertex,enableP):
+    def __drawDot(self,vertex,offset,enableP):
         p = int(255 - (vertex.getP() * 255))
         if enableP:
-            pygame.draw.circle(self.screen,(p,p,p),(vertex.getX(),vertex.getY()), 5,0)
+            pygame.draw.circle(self.screen,(p,p,p),(vertex.getX()+offset[0],vertex.getY()+offset[1]), 5,0)
         else:
-            pygame.draw.circle(self.screen,(125,125,125),(vertex.getX(),vertex.getY()), 5,0)
+            pygame.draw.circle(self.screen,(125,125,125),(vertex.getX()+offset[0],vertex.getY()+offset[1]), 5,0)
 
     #this function adds a new vertex and increases the propability of are vertex that are nearby
     def __addVertex(self,vertex):
