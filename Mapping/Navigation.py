@@ -8,13 +8,13 @@ class Navigation:
         self.screen = screen        
         self.driveStep = 0.5#aim for driving 0.5 meter berfore anther range map
         self.gap_data = []
-        self.readLimit = 200 #ignore everything over 200 cm
+        self.readLimit = 150 #ignore everything over 150 cm
         #self.locX = 350
         #self.locY = 350
         self.lastRotation = 0.0
         self.lastDistance = 0.0
         self.chosenGap = None
-        self.distanceFromLeft = 10 # in cm
+        self.distanceFromLeft = 60 # in cm
 
 
     def drive(self):

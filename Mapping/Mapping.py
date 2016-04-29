@@ -14,10 +14,12 @@ class Mapping:
         self.cmPerPix = 1
         self.gap_data = []
         self.vertexData = []
+        self.lastestVertexData = []
         self.path = []
         #first path point is always start point
         self.path.append(PathPoint(self.locX,self.locY))
         self.enableP = True
+        self.onlyLastestData = False
 
         
         self.rangeLimit = 200 #this is the max range that readings are tacken as true
@@ -25,11 +27,14 @@ class Mapping:
                               #vertices that are in this range of each other
                 
     def addRangeData(self,rangeData):
+        self.lastestVertexData = []
         for r in rangeData:
             angle = r.angle - 90 + self.rotation
             x = self.locX + r.distance *self.cmPerPix* math.cos(math.radians(angle))
             y = self.locY + r.distance *self.cmPerPix* math.sin(math.radians(angle))
-            self.__addVertex(Vertex(int(x),int(y)))
+            v = Vertex(int(x),int(y))#make vertex with default probability
+            self.vertexData.append(v) 
+            self.lastestVertexData.append(v)
         self.__fuseVertexData()
     
 
@@ -42,6 +47,10 @@ class Mapping:
     def getLastRotation(self):
         return self.lastRotation
 
+    def setOnlyLastestData(self,b):
+        self.onlyLastestData = b
+    def isOnlyLastestData(self):
+        return self.onlyLastestData
     def toggleEnableP(self):
         self.enableP = not self.enableP
 
@@ -69,7 +78,7 @@ class Mapping:
         pygame.draw.line(self.screen,(0,0,255),(int(self.locX+offset[0]),int(self.locY+offset[1])),(int(lineX+offset[0]),int(lineY+offset[1])),3)
 
         for i in range(1,len(self.path)):
-            pygame.draw.line(self.screen,(255,0,255),(self.path[i].x,self.path[i].y),(self.path[i-1].x,self.path[i-1].y),2)
+            pygame.draw.line(self.screen,(255,0,255),(self.path[i].x+offset[0],self.path[i].y+offset[1]),(self.path[i-1].x+offset[0],self.path[i-1].y+offset[1]),2)
     
     def drawVertex(self,offset):
         x = int(self.lastLocX + offset[0])
@@ -77,8 +86,12 @@ class Mapping:
         pygame.draw.circle(self.screen,(255,0,0),(x,y), 100 *self.cmPerPix, 1)
         pygame.draw.circle(self.screen,(255,0,0),(x,y), 200 *self.cmPerPix, 1)
 
-        for vertex in self.vertexData:
-            self.__drawDot(vertex,offset,self.enableP)
+        if self.onlyLastestData:
+            for vertex in self.lastestVertexData:
+                self.__drawDot(vertex,offset,self.enableP)
+        else:
+            for vertex in self.vertexData:
+                self.__drawDot(vertex,offset,self.enableP)
     
     def __drawDot(self,vertex,offset,enableP):
         p = int(255 - (vertex.getP() * 255))
@@ -87,11 +100,7 @@ class Mapping:
         else:
             pygame.draw.circle(self.screen,(125,125,125),(vertex.getX()+offset[0],vertex.getY()+offset[1]), 5,0)
 
-    #this function adds a new vertex and increases the propability of are vertex that are nearby
-    def __addVertex(self,vertex):
-        self.vertexData.append(vertex) #add vertex with default probability
 
-        
     #iterates through the vertices tat are in range and finds any that are by themselves
     #if they have nothing in range the propbability is reduced
     def __fuseVertexData(self):
@@ -108,18 +117,21 @@ class Mapping:
                         if distance < self.agreeRange:
                             #increase P on matched vertex (capped at 1)
                             if self.vertexData[j].getP() < 0.9:
-                                self.vertexData[j].setP(self.vertexData[j].getP() + 0.1)
+                                #if a vertex has 0 P, it is considered deleted (i dont actually delete it for
+                                # comparison between raw and propability maps)
+                                if self.vertexData[j].getP() > 0:
+                                    self.vertexData[j].setP(self.vertexData[j].getP() + 0.1)
                             else:
                                 self.vertexData[j].setP(1)
                             #found a match so dont decrease P
                             inAgreeRange = True
                 if inAgreeRange == False:
                     #nothing was in agree range
-                    #reduce probabilty of being a good reading (capped to 0.1)
-                    if self.vertexData[i].getP() > 0.2:
-                        self.vertexData[i].setP(self.vertexData[i].getP() - 0.1)
+                    #reduce probabilty of being a good reading (capped to 0)
+                    if self.vertexData[i].getP() > 0.15:
+                        self.vertexData[i].setP(self.vertexData[i].getP() - 0.15)
                     else:
-                        self.vertexData[i].setP(0.1)
+                        self.vertexData[i].setP(0.0)
                 
 
 #Class that holds simple positional data and a probability number

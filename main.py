@@ -64,6 +64,7 @@ if __name__ == "__main__":
             rangeData = r.fullRange()
             wait_for_results = True
 
+        #get keyboard input
         for event in pygame.event.get():
             if event.type == QUIT:
                 wait_for_input = False
@@ -74,17 +75,22 @@ if __name__ == "__main__":
                 if event.key == pygame.K_p:
                     m.toggleEnableP()
                     draw()
-                if event.key == pygame.K_UP:
-                    offset[1] = offset[1] - 50
+                if event.key == pygame.K_SPACE:
+                    r.setPaused(not r.isPaused())
+                if event.key == pygame.K_l:
+                    m.setOnlyLastestData(not m.isOnlyLastestData())
                     draw()
-                if event.key == pygame.K_DOWN:
+                if event.key == pygame.K_UP:
                     offset[1] = offset[1] + 50
                     draw()
+                if event.key == pygame.K_DOWN:
+                    offset[1] = offset[1] - 50
+                    draw()
                 if event.key == pygame.K_LEFT:
-                    offset[0] = offset[0] - 50
+                    offset[0] = offset[0] + 50
                     draw()
                 if event.key == pygame.K_RIGHT:
-                    offset[0] = offset[0] + 50
+                    offset[0] = offset[0] - 50
                     draw()
     r.cleanup()
     #wait for threads to end

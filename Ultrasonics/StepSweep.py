@@ -20,6 +20,8 @@ class StepSweep(Thread):
         self.inter_step_time = 0.35 #servo moving time
         self.steps = 15  #number of steps in sweep
         self.angle_sweep = 120 #amount of angle sweeped
+        #if readings disagree by more than this (in cm), the reading will be disregarded
+        self.consistancyThreshold = 100 
         self.angle = 0.0
         
         time.sleep(3)
@@ -34,6 +36,7 @@ class StepSweep(Thread):
         self.stop = False
         self.running = False
         self.done = False
+        self.pause = False
 
 
     def run(self):
@@ -43,6 +46,8 @@ class StepSweep(Thread):
             if not self.running:
                 time.sleep(0.02)
             else:
+                while self.pause:
+                    time.sleep(0.02)
                 self.range_data = []
                 #diff = self.start_deg_pwm - self.end_deg_pwm
                 #self.ranger1.debug = True
@@ -80,6 +85,8 @@ class StepSweep(Thread):
 
                     if self.stop:
                         return 0
+                    while self.pause:
+                        time.sleep(0.02)
                 
                 self.range_data.sort(key=lambda x: x.angle)
                 #for i in range(0,len(self.range_data)):
@@ -95,6 +102,11 @@ class StepSweep(Thread):
         
     def isDone(self):
         return self.done
+    
+    def setPaused(self,paused):
+        self.pause = paused
+    def isPaused(self):
+        return self.pause
     
     #make sure ranging is done before calling this
     def getRangeData(self):
@@ -135,7 +147,7 @@ class StepSweep(Thread):
             if data[i] < nmin:
                 nmin = data[i]
         data_range = nmax - nmin
-        if data_range > 75:
+        if data_range > self.consistancyThreshold:
             return 0
         else:
             #print "average:"
